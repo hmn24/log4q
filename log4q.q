@@ -12,6 +12,14 @@ sev: snk: `SILENT`DEBUG`INFO`WARN`ERROR`FATAL!();
 // Specify digits allowed for %XXX mapping
 digits: 5;
 
+// Suppress repeated logs - default is 0b
+suppressRepeat: 0b;
+cache: `SILENT`DEBUG`INFO`WARN`ERROR`FATAL!();
+
+// Hash any log messages
+hash: md5 -3! ::;
+
+// Default to standard logging {x@y} if count[x] = 1
 add: {
     h[first x]:: $[1 < count x; x 1; {x@y}];
     snk[y],:: first x;
@@ -63,7 +71,7 @@ mapArgs: {
     if[digits < 1; 
         '"Set .log4q.digits to above 1"
     ];
-    searchSpace: 1_ ,[;"[0-9]"]\[digits;"%"];
+    searchSpace: "%" ,\ digits# enlist "[0-9]";
     dict: findReg[first x]/[()!(); searchSpace];
     slicedStr: _[asc raze 0, flip (key dict; value dict); first x] except enlist "";
     idx: where slicedStr like "%[0-9]*";
@@ -88,7 +96,17 @@ l4qFnSpace: .Q.dd/:[``log4q; `$ ((), first ::) each string lower key snk];
 l4qExcept: {[h;e] '"log4q - ", string[h], " exception:", e};
 l4qProtEval: {[stdIO;msg] .[`.log4q.h[stdIO]; (stdIO;msg); l4qExcept[stdIO]]};
 
-l4qFnSpace set' {l4qProtEval[; logger[x; print y]] each snk[x]} @/: key[snk]; 
+// Log function - with option to suppress repetitive logs
+loggerFn: {
+    if[suppressRepeat;
+        hashSig: enlist hash y;
+        if[first hashSig in cache x; :()];
+        @[`.log4q.cache; x; union; hashSig];
+    ];
+    l4qProtEval[; logger[x; print y]] each snk[x]
+ };
+
+l4qFnSpace set' loggerFn @/: key[snk]; 
 
 // Identity Function
 n: (::);
@@ -100,6 +118,20 @@ sev: key[snk]!((s;d;i;w;e;f);(n;d;i;w;e;f);(n;n;i;w;e;f);(n;n;n;w;e;f);(n;n;n;n;
 add[1;`SILENT`DEBUG`INFO`WARN];
 add[2;`ERROR`FATAL]; 
 
+// Initiate the suppression of logs, incl. timer
+initSuppress: {
+    suppressRepeat:: 1b;
+    .z.ts: {cache:: `SILENT`DEBUG`INFO`WARN`ERROR`FATAL!();};
+    system "t 3600000";
+ };   
+
+// Deinit the suppression of logs, incl. timer
+deinitSuppress: {
+    suppressRepeat:: 0;
+    system "x .z.ts";
+    system "t 0";
+ };
+
 \d .
 
 // Set `SILENT`DEBUG`INFO`WARN`ERROR`FATAL
@@ -110,6 +142,10 @@ key[.log4q.snk] set' .log4q.sev[.log4q.sevLvl];
 log4q alike 
 
     p.bukowinski@gmail.com
+    
+    Reformatting/Improvements:
+    a0088188@u.nus.edu
+    
 =========================
 
 Features:

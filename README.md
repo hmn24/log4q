@@ -10,6 +10,7 @@ You can redirect logging messages simultaneously to entirely different outputs: 
 
 log4q has a simple API and a ready-to-use setup.
 
+log4q has the ability to suppress repetitive logs as well as allow up to X digits of args mapping
 
 ## Features summary
 
@@ -19,6 +20,7 @@ log4q has a simple API and a ready-to-use setup.
 * particular log levels are sent only to chosen sinks, filtered by severity level
 * simplified set of pattern layouts available – run-time switchable
 * `printf`-like injection of variables 
+* ability to suppress repetitive logs 
 
 
 ## Command-line options 
@@ -83,6 +85,18 @@ INFO (23.;`test);
 WARN `test;
 SILENT 23;
 INFO ("%1 %2";(`Test;2));
+```
+
+## Max Digits Mapping
+```
+.log4q.digits: 5 
+```
+
+
+## Suppression of Repetitive Logs
+```
+.log4q.initSuppress[]
+.log4q.deinitSuppress[]
 ```
 
 
