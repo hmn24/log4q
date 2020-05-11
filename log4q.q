@@ -143,9 +143,6 @@ log4q alike
 
     p.bukowinski@gmail.com
     
-    Reformatting/Improvements:
-    a0088188@u.nus.edu
-    
 =========================
 
 Features:
