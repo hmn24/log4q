@@ -1,6 +1,9 @@
 /
     Forked from https://github.com/prodrive11/log4q 
     Reformatted for easier reading -- More verbose
+    Introduced new features 
+     1) Dynamic Log Suppression
+     2) Enhanced ssr for args mapping
 \
 
 \d .log4q
